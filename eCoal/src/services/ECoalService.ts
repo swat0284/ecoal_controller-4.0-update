@@ -23,11 +23,7 @@ export class ECoalService {
     }).then(async (data) => {
       const hwData = (await data.json()) as ECoalInfoResponse;
 
-      if (hwData.cmd.hardware.hardwareversion !== "3.5") {
-        throw new Error(
-          `Unsupported hardware version: ${hwData.cmd.hardware.hardwareversion}. Supported version: 3.5`,
-        );
-      }
+      
 
       logger.info(
         `Connected to eCoal v${hwData.cmd.hardware.hardwareversion} (${hwData.cmd.hardware.softwareversion})`,
