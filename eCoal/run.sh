@@ -11,7 +11,7 @@ fi
 
 export NODE_ENV=production
 
-echo "Starting eCoal Furnace Controller..."
+echo "Starting ecoal 4.0 Controller..."
 echo "Configuration: $CONFIG_PATH"
 
 exec npx tsx /app/src/index.ts

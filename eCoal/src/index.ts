@@ -56,7 +56,9 @@ try {
 
     const customEntries = await ecoalService.fetchCustomEntries();
 
-    if (customEntries) {
+    if (customEntries === undefined) {
+      logger.debug("Custom entries polling skipped (no mappings configured)");
+    } else if (customEntries) {
       if (mqttService.isConnected()) {
         try {
           mqttService.publishCustomEntries(customEntries);
@@ -70,8 +72,6 @@ try {
       }
 
       logger.debug("Custom entries updated successfully");
-    } else {
-      logger.warn("Failed to fetch custom entries");
     }
   }
 

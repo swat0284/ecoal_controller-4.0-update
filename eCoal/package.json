@@ -1,6 +1,6 @@
 {
   "name": "ecoal-controller",
-  "version": "1.0.0",
+  "version": "1.0.9",
   "description": "Home Assistant addon for eCoal furnace controller integration via MQTT",
   "main": "src/index.ts",
   "scripts": {

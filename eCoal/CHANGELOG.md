@@ -1,5 +1,9 @@
 # What’s changed
 
+## 1.0.9
+- Added support for eCoal 4.0
+- Added optional raw response logging for controller migration work
+
 ## 1.0.8
 - Next fuel date
 
