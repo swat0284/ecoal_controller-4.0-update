@@ -81,25 +81,29 @@ export class ECoalService {
     }
   }
 
-  async fetchCustomEntries(): Promise<
-    { id: string; value: number | null }[] | undefined
-  > {
-    logger.info("Fetching custom entries");
+  private async sleep(ms: number): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
-    const joinedQuery = this.mappings.map((entry) => entry.id);
+  private isRetriableNetworkError(error: unknown): boolean {
+    const message = error instanceof Error ? error.message : String(error);
 
-    if (!joinedQuery.length) {
-      logger.warn("No custom temp and vtemp mappings configured, skipping");
-      return;
-    }
+    return (
+      message.includes("ECONNRESET") ||
+      message.includes("ETIMEDOUT") ||
+      message.includes("EPIPE") ||
+      message.includes("socket hang up")
+    );
+  }
 
-    const batches = batcher(joinedQuery, 5);
+  private async fetchAndParseWithRetries<T>(
+    url: string,
+    source: string,
+    maxRetries: number = 2,
+  ): Promise<T> {
+    let attempt = 0;
 
-    const entries: { id: string; value: number | null }[] = [];
-
-    for await (const batch of batches) {
-      const url = `http://${this.config.ecoal_host}/getregister.cgi?device=0&${batch.join("&")}`;
-
+    while (attempt <= maxRetries) {
       try {
         const response = await legacyFetch(url, {
           user: this.config.ecoal_username,
@@ -111,10 +115,52 @@ export class ECoalService {
         }
 
         const rawBody = await response.text();
-        this.logRawResponse("getregister.cgi/custom", response.headersRaw, rawBody);
+        this.logRawResponse(source, response.headersRaw, rawBody);
+        return await this.parseRawPayload<T>(rawBody, source);
+      } catch (error) {
+        const retriable = this.isRetriableNetworkError(error);
+        const isLastAttempt = attempt >= maxRetries;
 
-        const data = await this.parseRawPayload<ECoalResponse>(
-          rawBody,
+        if (!retriable || isLastAttempt) {
+          throw error;
+        }
+
+        const backoffMs = 250 * (attempt + 1);
+        logger.warn(
+          `Request retry ${attempt + 1}/${maxRetries} for '${url}' after network error: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        await this.sleep(backoffMs);
+      }
+
+      attempt += 1;
+    }
+
+    throw new Error(`Unexpected retry flow termination for '${url}'`);
+  }
+
+  async fetchCustomEntries(): Promise<
+    { id: string; value: number | null }[] | undefined
+  > {
+    logger.debug("Fetching custom entries");
+
+    const joinedQuery = this.mappings.map((entry) => entry.id);
+
+    if (!joinedQuery.length) {
+      logger.debug("No custom temp and vtemp mappings configured, skipping");
+      return;
+    }
+
+    const batches = batcher(joinedQuery, 3);
+
+    const entries: { id: string; value: number | null }[] = [];
+    let failedBatches = 0;
+
+    for await (const batch of batches) {
+      const url = `http://${this.config.ecoal_host}/getregister.cgi?device=0&${batch.join("&")}`;
+
+      try {
+        const data = await this.fetchAndParseWithRetries<ECoalResponse>(
+          url,
           "getregister.cgi/custom",
         );
 
@@ -140,11 +186,17 @@ export class ECoalService {
           });
         });
       } catch (e) {
-        logger.error("Failed to fetch eCoal data:", e);
+        failedBatches += 1;
+        logger.error("Failed to fetch custom entries data:", e);
         logger.error(`Request '${url}' failed`);
-
-        throw new Error(`Failed to fetch eCoal data: ${e}`);
+        continue;
       }
+    }
+
+    if (failedBatches > 0) {
+      logger.warn(
+        `Custom entries polling completed with ${failedBatches} failed batch(es)`,
+      );
     }
 
     return entries;
@@ -188,29 +240,18 @@ export class ECoalService {
           "ob3_zaw4d_pos",
           "pod_typ",
         ],
-        5,
+        3,
       );
 
       let mergeObject: Partial<ECoalResponse> = {};
+      let failedBatches = 0;
 
       for await (const batch of batches) {
         const url = `http://${this.config.ecoal_host}/getregister.cgi?device=0&${batch.join("&")}`;
 
         try {
-          const response = await legacyFetch(url, {
-            user: this.config.ecoal_username,
-            pass: this.config.ecoal_password,
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const rawBody = await response.text();
-          this.logRawResponse("getregister.cgi/poll", response.headersRaw, rawBody);
-
-          const data = await this.parseRawPayload<ECoalResponse>(
-            rawBody,
+          const data = await this.fetchAndParseWithRetries<ECoalResponse>(
+            url,
             "getregister.cgi/poll",
           );
 
@@ -223,11 +264,22 @@ export class ECoalService {
             cmd: { device: { reg: [data.cmd.device.reg] } },
           });
         } catch (e) {
-          logger.error("Failed to fetch eCoal data:", e);
+          failedBatches += 1;
+          logger.error("Failed to fetch eCoal data batch:", e);
           logger.error(`Request '${url}' failed`);
-
-          throw new Error(`Failed to fetch eCoal data: ${e}`);
+          continue;
         }
+      }
+
+      if (!mergeObject.cmd?.device?.reg) {
+        logger.error("Failed to fetch eCoal data: all batches failed");
+        return null;
+      }
+
+      if (failedBatches > 0) {
+        logger.warn(
+          `Polling completed with ${failedBatches} failed batch(es), publishing partial data`,
+        );
       }
 
       if (this.config.raw_data_logging) {
