@@ -14,7 +14,7 @@ RUN chmod +x run.sh
 EXPOSE 3000
 
 LABEL \
-    io.hass.name="eCoal Furnace Controller" \
+    io.hass.name="ecoal 4.0 Controller" \
     io.hass.description="Home Assistant addon for eCoal furnace controller integration via MQTT" \
     io.hass.arch="aarch64|i386|amd64" \
     io.hass.type="addon" \

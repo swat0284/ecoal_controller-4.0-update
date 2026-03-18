@@ -35,6 +35,9 @@ configuration:
   log_level:
     name: "Poziom logów"
     description: ""
+  raw_data_logging:
+    name: "Logowanie surowych danych (RAW)"
+    description: "Wypisuje pełne odpowiedzi JSON z pieca do logów addonu."
   tempMappings:
     name: "Mapowanie właściwości 'temp'"
     description: "Format: 1@temp=\"Temp czujnik. 1\";2@vtemp=\"Temp czujnik. 2\""

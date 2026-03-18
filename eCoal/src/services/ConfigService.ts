@@ -15,6 +15,9 @@ class ConfigService {
       logger.info(
         `Device: ${this.config.device_name} at ${this.config.ecoal_host}`,
       );
+      if (this.config.raw_data_logging) {
+        logger.info("Raw data logging is enabled");
+      }
 
       return this.config;
     } catch (error) {
@@ -30,6 +33,9 @@ class ConfigService {
         logger.info(
           `Device: ${this.config.device_name} at ${this.config.ecoal_host}`,
         );
+        if (this.config.raw_data_logging) {
+          logger.info("Raw data logging is enabled");
+        }
 
         return this.config;
       } catch (e) {

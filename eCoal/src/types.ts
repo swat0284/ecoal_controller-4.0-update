@@ -12,6 +12,7 @@ export interface Config {
   device_name: string;
   poll_interval: number;
   log_level: string;
+  raw_data_logging?: boolean;
   entity_language: string;
   tempMappings: string;
   vtempMappings: string;

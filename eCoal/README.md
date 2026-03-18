@@ -1,4 +1,4 @@
-# MQTT based eCoal Furnace Controller
+# MQTT based ecoal 4.0 Controller
 
 ## About
 
@@ -48,14 +48,17 @@ I decided to make this an addon instead of an integration because I'm not a pyth
   "mqtt_username": "admin",
   "mqtt_password": "password",
   "mqtt_topic_prefix": "homeassistant",
-  "device_name": "eCoal Furnace",
+  "device_name": "ecoal 4.0",
   "poll_interval": 30,
   "log_level": "info",
+  "raw_data_logging": false,
   "entity_language": "en",
   "tempMappings": "1@temp=\"Temp czujnik. 1\";2@vtemp=\"Temp czujnik. 2\"",
   "vtempMappings": "21@vtemp=\"Temp. głowica 1\";22@vtemp=\"Temp. głowica 2\""
 }
 ```
+
+Set `"raw_data_logging": true` to print full raw furnace API responses (body and headers, e.g. XML) to addon logs (`[RAW]` entries).
 
 2. Start a development MQTT broker by running `docker compose up` in the `dev-broker` directory.
 

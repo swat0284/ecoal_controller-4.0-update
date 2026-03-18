@@ -35,6 +35,9 @@ configuration:
   log_level:
     name: "Log Level"
     description: ""
+  raw_data_logging:
+    name: "Raw Data Logging (RAW)"
+    description: "Prints full furnace JSON responses to addon logs."
   tempMappings:
     name: "'temp' Property Mapping"
     description: "Format: 1@temp=\"Sensor Temp.\";2@vtemp=\"Sensor 2 VTemp.\""

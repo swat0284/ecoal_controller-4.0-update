@@ -1,4 +1,5 @@
 import merge from "deepmerge";
+import { parseStringPromise } from "xml2js";
 import type {
   Config,
   CustomMapping,
@@ -20,15 +21,64 @@ export class ECoalService {
     legacyFetch(`http://${this.config.ecoal_host}/info.cgi`, {
       user: this.config.ecoal_username,
       pass: this.config.ecoal_password,
-    }).then(async (data) => {
-      const hwData = (await data.json()) as ECoalInfoResponse;
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      
+        const rawBody = await response.text();
+        this.logRawResponse("info.cgi", response.headersRaw, rawBody);
 
-      logger.info(
-        `Connected to eCoal v${hwData.cmd.hardware.hardwareversion} (${hwData.cmd.hardware.softwareversion})`,
-      );
-    });
+        const hwData = await this.parseRawPayload<ECoalInfoResponse>(
+          rawBody,
+          "info.cgi",
+        );
+
+        logger.info(
+          `Connected to eCoal v${hwData.cmd.hardware.hardwareversion} (${hwData.cmd.hardware.softwareversion})`,
+        );
+      })
+      .catch((error) => {
+        logger.error("Failed to fetch info.cgi data:", error);
+      });
+  }
+
+  private logRawResponse(
+    source: string,
+    headersRaw: string,
+    rawBody: string,
+  ): void {
+    if (!this.config.raw_data_logging) {
+      return;
+    }
+
+    logger.info(`[RAW][${source}][HEADERS]\n${headersRaw}`);
+    logger.info(`[RAW][${source}][BODY]\n${rawBody}`);
+  }
+
+  private async parseRawPayload<T>(rawBody: string, source: string): Promise<T> {
+    try {
+      return (await parseStringPromise(rawBody, {
+        explicitArray: false,
+        mergeAttrs: true,
+        trim: true,
+        normalizeTags: false,
+      })) as T;
+    } catch (xmlError) {
+      try {
+        return JSON.parse(rawBody) as T;
+      } catch (jsonError) {
+        const xmlMessage =
+          xmlError instanceof Error ? xmlError.message : String(xmlError);
+        const jsonMessage =
+          jsonError instanceof Error ? jsonError.message : String(jsonError);
+
+        throw new Error(
+          `Failed to parse raw payload from ${source}. XML parse error: ${xmlMessage}. JSON parse error: ${jsonMessage}`,
+        );
+      }
+    }
   }
 
   async fetchCustomEntries(): Promise<
@@ -60,7 +110,13 @@ export class ECoalService {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = (await response.json()) as ECoalResponse;
+        const rawBody = await response.text();
+        this.logRawResponse("getregister.cgi/custom", response.headersRaw, rawBody);
+
+        const data = await this.parseRawPayload<ECoalResponse>(
+          rawBody,
+          "getregister.cgi/custom",
+        );
 
         batch.forEach((id) => {
           const entry = data.cmd.device.reg.find(
@@ -150,7 +206,13 @@ export class ECoalService {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
-          const data = (await response.json()) as ECoalResponse;
+          const rawBody = await response.text();
+          this.logRawResponse("getregister.cgi/poll", response.headersRaw, rawBody);
+
+          const data = await this.parseRawPayload<ECoalResponse>(
+            rawBody,
+            "getregister.cgi/poll",
+          );
 
           if (Array.isArray(data.cmd.device.reg)) {
             mergeObject = merge(mergeObject, data);
@@ -168,6 +230,11 @@ export class ECoalService {
         }
       }
 
+      if (this.config.raw_data_logging) {
+        logger.info(
+          `[RAW][getregister.cgi/poll_merged][PARSED]\n${JSON.stringify(mergeObject)}`,
+        );
+      }
       logger.debug("Fetched eCoal data successfully");
       return mergeObject as ECoalResponse;
     } catch (error) {
