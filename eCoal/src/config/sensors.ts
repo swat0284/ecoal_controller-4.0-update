@@ -274,14 +274,7 @@ export const sensorMappings: SensorMapping[] = [
     name: "burner_status",
     mqttUniqueId: "sensor_burner_status",
     tid: "pl_status",
-    type: "enum",
-    values: {
-      0: "burner_status_stop",
-      1: "burner_status_igniting",
-      2: "burner_status_heating",
-      3: "burner_status_extinguishing",
-      4: "burner_status_calibration",
-    },
+    type: "state",
   },
   {
     name: "pressure_difference",
