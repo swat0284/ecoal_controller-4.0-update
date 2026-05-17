@@ -136,6 +136,19 @@ export interface TemperatureControlMapping {
   maxValue: number;
 }
 
+export interface SelectControlOption {
+  name: keyof Translations;
+  value: string;
+}
+
+export interface SelectControlMapping {
+  name: keyof Translations;
+  mqttUniqueId: string;
+  setId: TID;
+  currentValueId: TID;
+  options: SelectControlOption[];
+}
+
 export interface ApiResponse {
   success: boolean;
   data?: ECoalData;

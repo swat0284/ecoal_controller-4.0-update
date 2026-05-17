@@ -1,5 +1,9 @@
 import mqtt from "mqtt";
-import { sensorMappings, temperatureControlMappings } from "../config/sensors";
+import {
+  selectControlMappings,
+  sensorMappings,
+  temperatureControlMappings,
+} from "../config/sensors";
 import t from "../i18n/t";
 import type {
   Config,
@@ -146,6 +150,34 @@ export class MqttService {
         );
       }
     });
+
+    selectControlMappings.forEach((config) => {
+      const register = data.cmd.device.reg.find(
+        (r) => r.tid === config.currentValueId,
+      );
+
+      if (!register?.v) {
+        return;
+      }
+
+      const option = config.options.find((option) => option.value === register.v);
+
+      if (!option) {
+        logger.warn(
+          `Unknown select value '${register.v}' for ${config.mqttUniqueId}`,
+        );
+        return;
+      }
+
+      const stateTopic = `${this.config.mqtt_topic_prefix}/select/${this.deviceId}/${config.mqttUniqueId}/state`;
+      const translatedValue = t(option.name);
+
+      this.mqttClient.publish(stateTopic, translatedValue);
+
+      logger.debug(
+        `Published select data: ${config.mqttUniqueId} = ${translatedValue}`,
+      );
+    });
   }
 
   publishCustomEntries(data: { id: string; value: number | null }[]): void {
@@ -280,6 +312,33 @@ export class MqttService {
       );
     });
 
+    selectControlMappings.forEach((config) => {
+      const selectDiscoveryTopic = `${this.config.mqtt_topic_prefix}/select/${this.deviceId}/${config.mqttUniqueId}/config`;
+      const selectStateTopic = `${this.config.mqtt_topic_prefix}/select/${this.deviceId}/${config.mqttUniqueId}/state`;
+      const selectCommandTopic = `${this.config.mqtt_topic_prefix}/select/${this.deviceId}/${config.mqttUniqueId}/set`;
+
+      const selectConfig = {
+        name: t(config.name),
+        unique_id: `${this.deviceId}_${config.mqttUniqueId}`,
+        state_topic: selectStateTopic,
+        command_topic: selectCommandTopic,
+        options: config.options.map((option) => t(option.name)),
+        icon: "mdi:form-select",
+        device: {
+          identifiers: [this.deviceId],
+          name: this.config.device_name,
+          manufacturer: "eCoal",
+          model: "Furnace Controller",
+        },
+      };
+
+      this.mqttClient.publish(
+        selectDiscoveryTopic,
+        JSON.stringify(selectConfig),
+        { retain: true },
+      );
+    });
+
     logger.info("Published MQTT discovery configurations");
   }
 
@@ -292,8 +351,13 @@ export class MqttService {
       this.mqttClient.subscribe(numberTopic);
     });
 
+    selectControlMappings.forEach((config) => {
+      const selectTopic = `${this.config.mqtt_topic_prefix}/select/${this.deviceId}/${config.mqttUniqueId}/set`;
+      this.mqttClient.subscribe(selectTopic);
+    });
+
     logger.info(
-      `Subscribed to command topics: ${commandTopic} and number control topics`,
+      `Subscribed to command topics: ${commandTopic}, number control topics and select control topics`,
     );
   }
 
@@ -340,6 +404,38 @@ export class MqttService {
             `Invalid temperature value: ${message} for ${numberConfig.mqttUniqueId}`,
           );
         }
+      }
+    } else if (topic.includes("/select/")) {
+      const selectConfig = selectControlMappings.find((config) =>
+        topic.includes(`/${config.mqttUniqueId}/set`),
+      );
+
+      if (!selectConfig) {
+        return;
+      }
+
+      const option = selectConfig.options.find(
+        (option) =>
+          t(option.name) === message ||
+          option.name === message ||
+          option.value === message,
+      );
+
+      if (!option) {
+        logger.warn(
+          `Invalid select value: ${message} for ${selectConfig.mqttUniqueId}`,
+        );
+        return;
+      }
+
+      const success = await this.setECoalValue(selectConfig.setId, option.value);
+
+      if (success) {
+        const stateTopic = `${this.config.mqtt_topic_prefix}/select/${this.deviceId}/${selectConfig.mqttUniqueId}/state`;
+        const translatedValue = t(option.name);
+
+        this.mqttClient.publish(stateTopic, translatedValue);
+        logger.info(`Set ${selectConfig.mqttUniqueId} to ${translatedValue}`);
       }
     }
   }

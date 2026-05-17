@@ -1,4 +1,8 @@
-import type { SensorMapping, TemperatureControlMapping } from "../types";
+import type {
+  SelectControlMapping,
+  SensorMapping,
+  TemperatureControlMapping,
+} from "../types";
 
 export const sensorMappings: SensorMapping[] = [
   {
