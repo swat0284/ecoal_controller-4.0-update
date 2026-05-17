@@ -38,4 +38,13 @@ export default {
   retort_group: "Retortowy Grupowy",
   retort_ecoal: "Retortowy eCoal",
   next_fuel_date: "Data następnego zasypu",
+  winter_summer_mode: "Tryb zima/lato",
+  dhw_mode: "Tryb CWU",
+  additional_pump_function: "Funkcja pompy dodatkowej",
+  feeder_temp_mpl: "Temp. podajnika MPL",
+  burner_power: "Moc palnika",
+  burner_status: "Status pracy palnika",
+  pressure_difference: "Różnica ciśnień",
+  ignition_count: "Ilość rozpaleń",
+  feeder_runtime: "Czas pracy podajnika",
 } satisfies Translations;
