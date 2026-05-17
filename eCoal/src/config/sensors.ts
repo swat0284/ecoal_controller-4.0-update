@@ -253,14 +253,7 @@ export const sensorMappings: SensorMapping[] = [
     name: "dhw_mode",
     mqttUniqueId: "sensor_dhw_mode",
     tid: "cwu_state",
-    type: "enum",
-    values: {
-      0: "dhw_mode_off",
-      1: "dhw_mode_schedule",
-      2: "dhw_mode_on",
-      3: "dhw_mode_boost_1h",
-      4: "dhw_mode_boost_2h",
-    },
+    type: "state",
   },
   {
     name: "additional_pump_function",
@@ -285,14 +278,7 @@ export const sensorMappings: SensorMapping[] = [
     name: "burner_status",
     mqttUniqueId: "sensor_burner_status",
     tid: "pl_status",
-    type: "enum",
-    values: {
-      0: "burner_status_stop",
-      1: "burner_status_igniting",
-      2: "burner_status_heating",
-      3: "burner_status_extinguishing",
-      4: "burner_status_calibration",
-    },
+    type: "state",
   },
   {
     name: "pressure_difference",
@@ -309,22 +295,6 @@ export const sensorMappings: SensorMapping[] = [
     mqttUniqueId: "sensor_feeder_runtime",
     tid: "pod_run_time_str",
     type: "state",
-  },
-];
-
-export const selectControlMappings: SelectControlMapping[] = [
-  {
-    name: "dhw_mode",
-    mqttUniqueId: "control_dhw_mode",
-    setId: "cwu_state",
-    currentValueId: "cwu_state",
-    options: [
-      { name: "dhw_mode_off", value: "0" },
-      { name: "dhw_mode_schedule", value: "1" },
-      { name: "dhw_mode_on", value: "2" },
-      { name: "dhw_mode_boost_1h", value: "3" },
-      { name: "dhw_mode_boost_2h", value: "4" },
-    ],
   },
 ];
 
