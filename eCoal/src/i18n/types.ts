@@ -37,7 +37,14 @@ export type Translations = {
   retort_ecoal: string;
   next_fuel_date: string;
   winter_summer_mode: string;
+  winter_summer_mode_winter: string;
+  winter_summer_mode_summer: string;
+  winter_summer_mode_auto_summer: string;
   dhw_mode: string;
+  dhw_mode_off: string;
+  dhw_mode_schedule: string;
+  dhw_mode_heating: string;
+  dhw_mode_boost: string;
   additional_pump_function: string;
   feeder_temp_mpl: string;
   burner_power: string;
