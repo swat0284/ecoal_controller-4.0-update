@@ -247,7 +247,12 @@ export const sensorMappings: SensorMapping[] = [
     name: "winter_summer_mode",
     mqttUniqueId: "sensor_winter_summer_mode",
     tid: "zima_lato_state",
-    type: "state",
+    type: "enum",
+    values: {
+      0: "winter_summer_mode_winter",
+      1: "winter_summer_mode_summer",
+      2: "winter_summer_mode_auto_summer",
+    },
   },
   {
     name: "dhw_mode",
@@ -295,6 +300,32 @@ export const sensorMappings: SensorMapping[] = [
     mqttUniqueId: "sensor_feeder_runtime",
     tid: "pod_run_time_str",
     type: "state",
+  },
+];
+
+export const selectControlMappings: SelectControlMapping[] = [
+  {
+    name: "dhw_mode",
+    mqttUniqueId: "control_dhw_mode",
+    setId: "cwu_state",
+    currentValueId: "cwu_state",
+    options: [
+      { name: "dhw_mode_off", value: "0" },
+      { name: "dhw_mode_schedule", value: "1" },
+      { name: "dhw_mode_heating", value: "2" },
+      { name: "dhw_mode_boost", value: "3" },
+    ],
+  },
+  {
+    name: "winter_summer_mode",
+    mqttUniqueId: "control_winter_summer_mode",
+    setId: "zima_lato",
+    currentValueId: "zima_lato_state",
+    options: [
+      { name: "winter_summer_mode_winter", value: "0" },
+      { name: "winter_summer_mode_summer", value: "1" },
+      { name: "winter_summer_mode_auto_summer", value: "2" },
+    ],
   },
 ];
 

@@ -116,6 +116,7 @@ export type TID =
   | "vtemp"
   | "pod_typ"
   | "zima_lato_state"
+  | "zima_lato"
   | "cwu_state"
   | "pomp_ext_func"
   | "mpl_temp"
