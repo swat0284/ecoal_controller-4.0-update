@@ -38,4 +38,13 @@ export default {
   retort_group: "Retort Group",
   retort_ecoal: "Retort eCoal",
   next_fuel_date: "Next fuel date",
+  winter_summer_mode: "Winter/summer mode",
+  dhw_mode: "DHW mode",
+  additional_pump_function: "Additional pump function",
+  feeder_temp_mpl: "MPL feeder temp.",
+  burner_power: "Burner power",
+  burner_status: "Burner status",
+  pressure_difference: "Pressure difference",
+  ignition_count: "Ignition count",
+  feeder_runtime: "Feeder runtime",
 } satisfies Translations;

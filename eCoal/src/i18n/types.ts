@@ -36,4 +36,13 @@ export type Translations = {
   retort_group: string;
   retort_ecoal: string;
   next_fuel_date: string;
+  winter_summer_mode: string;
+  dhw_mode: string;
+  additional_pump_function: string;
+  feeder_temp_mpl: string;
+  burner_power: string;
+  burner_status: string;
+  pressure_difference: string;
+  ignition_count: string;
+  feeder_runtime: string;
 };
