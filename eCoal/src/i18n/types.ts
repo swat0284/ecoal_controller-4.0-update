@@ -49,6 +49,11 @@ export type Translations = {
   feeder_temp_mpl: string;
   burner_power: string;
   burner_status: string;
+  burner_status_stop: string;
+  burner_status_ignition: string;
+  burner_status_work: string;
+  burner_status_extinguishing: string;
+  burner_status_cleaning: string;
   pressure_difference: string;
   ignition_count: string;
   feeder_runtime: string;
