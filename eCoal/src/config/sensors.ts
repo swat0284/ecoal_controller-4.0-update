@@ -1,4 +1,8 @@
-import type { SensorMapping, TemperatureControlMapping } from "../types";
+import type {
+  SelectControlMapping,
+  SensorMapping,
+  TemperatureControlMapping,
+} from "../types";
 
 export const sensorMappings: SensorMapping[] = [
   {
@@ -238,6 +242,89 @@ export const sensorMappings: SensorMapping[] = [
     mqttUniqueId: "sensor_next_fuel_time",
     tid: "next_fuel_time",
     type: "date",
+  },
+  {
+    name: "winter_summer_mode",
+    mqttUniqueId: "sensor_winter_summer_mode",
+    tid: "zima_lato_state",
+    type: "state",
+  },
+  {
+    name: "dhw_mode",
+    mqttUniqueId: "sensor_dhw_mode",
+    tid: "cwu_state",
+    type: "enum",
+    values: {
+      0: "dhw_mode_off",
+      1: "dhw_mode_schedule",
+      2: "dhw_mode_on",
+      3: "dhw_mode_boost_1h",
+      4: "dhw_mode_boost_2h",
+    },
+  },
+  {
+    name: "additional_pump_function",
+    mqttUniqueId: "sensor_additional_pump_function",
+    tid: "pomp_ext_func",
+    type: "state",
+  },
+  {
+    name: "feeder_temp_mpl",
+    mqttUniqueId: "sensor_feeder_temp_mpl",
+    tid: "mpl_temp",
+    unit: "°C",
+    type: "temp",
+  },
+  {
+    name: "burner_power",
+    mqttUniqueId: "sensor_burner_power",
+    tid: "pl_power_kw",
+    unit: "kW",
+  },
+  {
+    name: "burner_status",
+    mqttUniqueId: "sensor_burner_status",
+    tid: "pl_status",
+    type: "enum",
+    values: {
+      0: "burner_status_stop",
+      1: "burner_status_igniting",
+      2: "burner_status_heating",
+      3: "burner_status_extinguishing",
+      4: "burner_status_calibration",
+    },
+  },
+  {
+    name: "pressure_difference",
+    mqttUniqueId: "sensor_pressure_difference",
+    tid: "dp_value",
+  },
+  {
+    name: "ignition_count",
+    mqttUniqueId: "sensor_ignition_count",
+    tid: "pl_tfire",
+  },
+  {
+    name: "feeder_runtime",
+    mqttUniqueId: "sensor_feeder_runtime",
+    tid: "pod_run_time_str",
+    type: "state",
+  },
+];
+
+export const selectControlMappings: SelectControlMapping[] = [
+  {
+    name: "dhw_mode",
+    mqttUniqueId: "control_dhw_mode",
+    setId: "cwu_state",
+    currentValueId: "cwu_state",
+    options: [
+      { name: "dhw_mode_off", value: "0" },
+      { name: "dhw_mode_schedule", value: "1" },
+      { name: "dhw_mode_on", value: "2" },
+      { name: "dhw_mode_boost_1h", value: "3" },
+      { name: "dhw_mode_boost_2h", value: "4" },
+    ],
   },
 ];
 

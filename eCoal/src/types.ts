@@ -114,7 +114,16 @@ export type TID =
   | "tpow_value"
   | "temp"
   | "vtemp"
-  | "pod_typ";
+  | "pod_typ"
+  | "zima_lato_state"
+  | "cwu_state"
+  | "pomp_ext_func"
+  | "mpl_temp"
+  | "pl_power_kw"
+  | "pl_status"
+  | "dp_value"
+  | "pl_tfire"
+  | "pod_run_time_str";
 
 export interface TemperatureControlMapping {
   name: keyof Translations;
@@ -125,6 +134,19 @@ export interface TemperatureControlMapping {
   unit: string;
   minValue: number;
   maxValue: number;
+}
+
+export interface SelectControlOption {
+  name: keyof Translations;
+  value: string;
+}
+
+export interface SelectControlMapping {
+  name: keyof Translations;
+  mqttUniqueId: string;
+  setId: TID;
+  currentValueId: TID;
+  options: SelectControlOption[];
 }
 
 export interface ApiResponse {
