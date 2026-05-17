@@ -239,6 +239,66 @@ export const sensorMappings: SensorMapping[] = [
     tid: "next_fuel_time",
     type: "date",
   },
+  {
+    name: "winter_summer_mode",
+    mqttUniqueId: "sensor_winter_summer_mode",
+    tid: "zima_lato_state",
+    type: "state",
+  },
+  {
+    name: "dhw_mode",
+    mqttUniqueId: "sensor_dhw_mode",
+    tid: "cwu_state",
+    type: "state",
+  },
+  {
+    name: "additional_pump_function",
+    mqttUniqueId: "sensor_additional_pump_function",
+    tid: "pomp_ext_func",
+    type: "state",
+  },
+  {
+    name: "feeder_temp_mpl",
+    mqttUniqueId: "sensor_feeder_temp_mpl",
+    tid: "mpl_temp",
+    unit: "°C",
+    type: "temp",
+  },
+  {
+    name: "burner_power",
+    mqttUniqueId: "sensor_burner_power",
+    tid: "pl_power_kw",
+    unit: "kW",
+  },
+  {
+    name: "burner_status",
+    mqttUniqueId: "sensor_burner_status",
+    tid: "pl_status",
+    type: "enum",
+    values: {
+      0: "burner_status_stop",
+      1: "burner_status_igniting",
+      2: "burner_status_heating",
+      3: "burner_status_extinguishing",
+      4: "burner_status_calibration",
+    },
+  },
+  {
+    name: "pressure_difference",
+    mqttUniqueId: "sensor_pressure_difference",
+    tid: "dp_value",
+  },
+  {
+    name: "ignition_count",
+    mqttUniqueId: "sensor_ignition_count",
+    tid: "pl_tfire",
+  },
+  {
+    name: "feeder_runtime",
+    mqttUniqueId: "sensor_feeder_runtime",
+    tid: "pod_run_time_str",
+    type: "state",
+  },
 ];
 
 export const temperatureControlMappings: TemperatureControlMapping[] = [
